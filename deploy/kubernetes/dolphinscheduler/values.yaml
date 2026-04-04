@@ -34,6 +34,8 @@ image:
   registry: apache
   # -- Docker image version for the DolphinScheduler
   tag: latest
+  # -- Docker image variant. Use `bundled-plugins` for the official plugin-bundled images, or set to `""` to use the base release images.
+  variant: bundled-plugins
   # -- Image pull policy. Options: Always, Never, IfNotPresent
   pullPolicy: "IfNotPresent"
   # -- Specify a imagePullSecrets

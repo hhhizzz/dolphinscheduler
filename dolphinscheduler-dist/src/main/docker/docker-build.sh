@@ -19,13 +19,16 @@ set -xeo pipefail
 
 DOCKER_HUB=$1
 DOCKER_TAG=$2
+DOCKER_TAG_SUFFIX=$3
+DOCKER_LATEST_TAG=$4
 DOCKER_REPO_BASE=dolphinscheduler
+DOCKER_VERSION_TAG=${DOCKER_TAG}${DOCKER_TAG_SUFFIX}
 
 CURRENT_HOME=$(dirname $(readlink -f "$0"))
 
-docker buildx build --load --no-cache -t $DOCKER_HUB/$DOCKER_REPO_BASE-api:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-api:latest -f ${CURRENT_HOME}/api-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-master:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-master:latest -f ${CURRENT_HOME}/master-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-worker:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-worker:latest -f ${CURRENT_HOME}/worker-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-alert-server:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-alert-server:latest -f ${CURRENT_HOME}/alert-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-standalone-server:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-standalone-server:latest -f ${CURRENT_HOME}/standalone-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-tools:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-tools:latest -f ${CURRENT_HOME}/tools.dockerfile .
+docker buildx build --load --no-cache -t $DOCKER_HUB/$DOCKER_REPO_BASE-api:$DOCKER_VERSION_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-api:$DOCKER_LATEST_TAG -f ${CURRENT_HOME}/api-server.dockerfile .
+docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-master:$DOCKER_VERSION_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-master:$DOCKER_LATEST_TAG -f ${CURRENT_HOME}/master-server.dockerfile .
+docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-worker:$DOCKER_VERSION_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-worker:$DOCKER_LATEST_TAG -f ${CURRENT_HOME}/worker-server.dockerfile .
+docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-alert-server:$DOCKER_VERSION_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-alert-server:$DOCKER_LATEST_TAG -f ${CURRENT_HOME}/alert-server.dockerfile .
+docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-standalone-server:$DOCKER_VERSION_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-standalone-server:$DOCKER_LATEST_TAG -f ${CURRENT_HOME}/standalone-server.dockerfile .
+docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-tools:$DOCKER_VERSION_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-tools:$DOCKER_LATEST_TAG -f ${CURRENT_HOME}/tools.dockerfile .

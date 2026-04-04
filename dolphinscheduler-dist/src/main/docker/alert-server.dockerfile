@@ -27,8 +27,10 @@ RUN apt update ; \
 
 WORKDIR $DOLPHINSCHEDULER_HOME
 
+COPY ./src/main/docker/prune-plugins.sh /usr/local/bin/prune-plugins.sh
 COPY ./target/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
 RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz --strip-components=1 ; \
+    bash /usr/local/bin/prune-plugins.sh alert-plugins ; \
     rm -f apache-dolphinscheduler-*-bin.tar.gz
 
 EXPOSE 12345 25333

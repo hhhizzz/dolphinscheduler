@@ -186,6 +186,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | image.registry | string | `"apache"` | Docker image repository for the DolphinScheduler |
 | image.tag | string | `"latest"` | Docker image version for the DolphinScheduler |
 | image.tools | string | `"dolphinscheduler-tools"` | tools image |
+| image.variant | string | `"bundled-plugins"` | Docker image variant. Use `bundled-plugins` for the official plugin-bundled images, or set to `""` to use the base release images. |
 | image.worker | string | `"dolphinscheduler-worker"` | worker image |
 | ingress.annotations | object | `{}` | Ingress annotations |
 | ingress.enabled | bool | `false` | Enable ingress |

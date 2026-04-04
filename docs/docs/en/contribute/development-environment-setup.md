@@ -96,8 +96,9 @@ DolphinScheduler will release new Docker images after it released, you could fin
 
 - If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
 
-> -Pstaging contains plugins, suitable for development and testing as well as offline deployment without a network environment
-> -Prelease does not contain plugins, suitable for production environments, and plugins can be downloaded on demand from a network that can access plugins
+> -Pbundled-plugins builds the official `-bundled-plugins` image variant with bundled plugins, suitable for distributed deployment and offline environments
+> -Prelease keeps the base image without bundled plugins
+> -The `bundled-plugins` variant only bundles the official plugin set maintained in the source tree. Custom plugins and extra drivers still need to be packaged separately.
 
 ```shell
 cd dolphinscheduler
@@ -105,7 +106,7 @@ cd dolphinscheduler
        -Dmaven.test.skip \
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,[release|staging]
+       -Pdocker,[release|bundled-plugins]
 ```
 
 When the command is finished you could find them by command `docker images`.
@@ -119,7 +120,7 @@ cd dolphinscheduler
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,[release|staging]
+       -Pdocker,[release|bundled-plugins]
 ```
 
 - If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command to find all Dockerfile files.

@@ -29,20 +29,28 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create default docker images' fullname.
 */}}
+{{- define "dolphinscheduler.image.tag" -}}
+{{- $tag := .Values.image.tag | default .Chart.AppVersion -}}
+{{- if .Values.image.variant -}}
+{{- printf "%s-%s" $tag .Values.image.variant -}}
+{{- else -}}
+{{- $tag -}}
+{{- end -}}
+{{- end -}}
 {{- define "dolphinscheduler.image.fullname.master" -}}
-{{- .Values.image.registry }}/{{ .Values.image.master }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.master }}:{{ include "dolphinscheduler.image.tag" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.worker" -}}
-{{- .Values.image.registry }}/{{ .Values.image.worker }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.worker }}:{{ include "dolphinscheduler.image.tag" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.api" -}}
-{{- .Values.image.registry }}/{{ .Values.image.api }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.api }}:{{ include "dolphinscheduler.image.tag" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.alert" -}}
-{{- .Values.image.registry }}/{{ .Values.image.alert }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.alert }}:{{ include "dolphinscheduler.image.tag" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.tools" -}}
-{{- .Values.image.registry }}/{{ .Values.image.tools }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.tools }}:{{ include "dolphinscheduler.image.tag" . -}}
 {{- end -}}
 
 {{/*
@@ -350,6 +358,7 @@ Create a fsFileResourcePersistence volumeMount.
   name: {{ include "dolphinscheduler.fullname" . }}-fs-file
 {{- end -}}
 {{- end -}}
+
 
 {{/*
 Create a etcd ssl volume.

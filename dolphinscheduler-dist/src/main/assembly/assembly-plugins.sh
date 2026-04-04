@@ -26,7 +26,9 @@ if [ ! -f $BIN_TAR_FILE ]; then
   exit 1
 fi
 
-cd $DIST_DIR && tar -zxf apache-dolphinscheduler-*-bin.tar.gz
+cd $DIST_DIR
+rm -rf apache-dolphinscheduler-*-bin
+tar -zxf apache-dolphinscheduler-*-bin.tar.gz
 cd $DIST_DIR/apache-dolphinscheduler-*-bin
 BIN_DIR=$(pwd)
 
@@ -44,7 +46,7 @@ else
   for plugin_path in ${PLUGINS_PATH[@]}
   do
     cd $BIN_DIR/plugins/$plugin_path
-    find ./* -name "*.jar" | xargs -I {} mv {} ./
+    find . -mindepth 2 -name "*.jar" -exec mv {} ./ \;
     ls -d */ | xargs -I {} rm -rf {}
   done
 fi
@@ -70,12 +72,12 @@ do
     mv $MODULE_LIB_DIR/$jar $SHARED_LIB_DIR/$jar
 
     # create a symbolic link in the subproject's lib directory
-    ln -s ../../libs/$jar $jar
+    ln -sfn ../../libs/$jar $jar
   done
 done
 
 # create symbolic link for standalone-server
-cd $BIN_DIR/standalone-server && ln -s ../tools/sql/sql sql
+cd $BIN_DIR/standalone-server && ln -sfn ../tools/sql/sql sql
 
 # repack bin tar
 BIN_TAR_FILE_NAME=$(basename $BIN_TAR_FILE)

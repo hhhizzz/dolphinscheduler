@@ -93,6 +93,8 @@
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
+        <docker.tag.suffix></docker.tag.suffix>
+        <docker.latest.tag>latest</docker.latest.tag>
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
         <skipDepCheck>true</skipDepCheck>
@@ -837,6 +839,16 @@
             <properties>
                 <docker.build.skip>false</docker.build.skip>
                 <docker.push.skip>false</docker.push.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>bundled-plugins</id>
+            <properties>
+                <build.ui.skip>false</build.ui.skip>
+                <build.plugins.skip>false</build.plugins.skip>
+                <build.assembly.skip>false</build.assembly.skip>
+                <docker.tag.suffix>-bundled-plugins</docker.tag.suffix>
+                <docker.latest.tag>latest-bundled-plugins</docker.latest.tag>
             </properties>
         </profile>
         <profile>

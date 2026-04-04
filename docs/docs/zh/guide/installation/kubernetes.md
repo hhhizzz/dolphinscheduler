@@ -481,6 +481,8 @@ common:
 
 对于配置其他字段相关细节, 请参考: [资源中心配置详情](../resource/configuration.md)
 
+官方 Helm Chart 默认使用 `bundled-plugins` 镜像变体。该变体只内置源码仓库中维护的官方插件集合。如果你固定使用自己的基础 release 镜像，请将 `image.variant=""`，并确保所需插件已经预先打包进镜像。
+
 ### 如何单独部署特定组件?
 
 修改 `values.yaml` 文件中的 `api.enabled`, `alert.enabled` `master.enabled` 或 `worker.enabled` 配置项

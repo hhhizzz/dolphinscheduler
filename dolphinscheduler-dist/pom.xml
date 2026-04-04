@@ -150,6 +150,8 @@
                                         <argument>src/main/docker/docker-build.sh</argument>
                                         <argument>${docker.hub}</argument>
                                         <argument>${docker.tag}</argument>
+                                        <argument>${docker.tag.suffix}</argument>
+                                        <argument>${docker.latest.tag}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -170,6 +172,8 @@
                                         <argument>src/main/docker/docker-push.sh</argument>
                                         <argument>${docker.hub}</argument>
                                         <argument>${docker.tag}</argument>
+                                        <argument>${docker.tag.suffix}</argument>
+                                        <argument>${docker.latest.tag}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

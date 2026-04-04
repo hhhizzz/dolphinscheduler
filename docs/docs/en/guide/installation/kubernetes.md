@@ -482,6 +482,8 @@ common:
 
 For detailed explanation of specific fields, please see: [Resource Center Configuration](../resource/configuration.md)
 
+The official Helm chart uses the `bundled-plugins` image variant by default. This variant only bundles the official plugin set maintained in the source tree. If you pin your own base release images, set `image.variant=""` and make sure the required plugins are already baked into those images.
+
 ### How to deploy specific components separately?
 
 Modify the `api.enabled`, `alert.enabled`, `master.enabled`, or `worker.enabled` configuration items in the `values.yaml` file.

@@ -28,8 +28,10 @@ RUN apt update ; \
 WORKDIR $DOLPHINSCHEDULER_HOME
 
 # see doc: https://dolphinscheduler.apache.org/en-us/docs/dev/user_doc/guide/upgrade.html
+COPY ./src/main/docker/prune-plugins.sh /usr/local/bin/prune-plugins.sh
 COPY ./target/apache-dolphinscheduler-*-bin.tar.gz $DOLPHINSCHEDULER_HOME
 RUN tar -zxvf apache-dolphinscheduler-*-bin.tar.gz --strip-components=1 ; \
+    bash /usr/local/bin/prune-plugins.sh storage-plugins ; \
     rm -f apache-dolphinscheduler-*-bin.tar.gz
 
 ENTRYPOINT [ "/bin/bash" ]
