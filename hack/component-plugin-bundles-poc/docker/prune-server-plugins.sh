@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PLUGINS_DIR="/opt/dolphinscheduler/plugins"
+PLUGINS_DIR="${PLUGINS_DIR:-/opt/dolphinscheduler/plugins}"
 
 for plugin_dir in datasource-plugins storage-plugins task-plugins; do
   test -d "${PLUGINS_DIR}/${plugin_dir}"
