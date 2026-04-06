@@ -12,8 +12,13 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=worker -n 
 kubectl exec -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api -- find /opt/dolphinscheduler/plugins/storage-plugins -maxdepth 1 -name "*.jar" | tee /tmp/api_storage_plugins
 test -s /tmp/api_storage_plugins
 
-kubectl logs -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api --tail=400 | egrep 'S3StorageOperator|Started ApiApplicationServer'
-kubectl logs -n ds-plugin-bundle-poc statefulset/ds-plugin-bundle-poc-worker --tail=400 | egrep 'bucketName: dolphinscheduler|PhysicalTaskEngineDelegator started'
+kubectl logs -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api --tail=400 | tee /tmp/api_verify_logs
+kubectl logs -n ds-plugin-bundle-poc statefulset/ds-plugin-bundle-poc-worker --tail=400 | tee /tmp/worker_verify_logs
 
-! kubectl logs -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api --tail=400 | egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException'
-! kubectl logs -n ds-plugin-bundle-poc statefulset/ds-plugin-bundle-poc-worker --tail=400 | egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException'
+egrep 'S3StorageOperator' /tmp/api_verify_logs
+egrep 'Started ApiApplicationServer' /tmp/api_verify_logs
+egrep 'bucketName: dolphinscheduler' /tmp/worker_verify_logs
+egrep 'PhysicalTaskEngineDelegator started' /tmp/worker_verify_logs
+
+! egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException|[^[:alnum:]]StorageOperator[^[:alnum:]]' /tmp/api_verify_logs
+! egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException|[^[:alnum:]]StorageOperator[^[:alnum:]]' /tmp/worker_verify_logs
