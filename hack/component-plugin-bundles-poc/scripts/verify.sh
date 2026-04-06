@@ -15,5 +15,5 @@ test -s /tmp/api_storage_plugins
 kubectl logs -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api --tail=400 | egrep 'S3StorageOperator|Started ApiApplicationServer'
 kubectl logs -n ds-plugin-bundle-poc statefulset/ds-plugin-bundle-poc-worker --tail=400 | egrep 'bucketName: dolphinscheduler|PhysicalTaskEngineDelegator started'
 
-! kubectl logs -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api --tail=400 | egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException|StorageOperator'
-! kubectl logs -n ds-plugin-bundle-poc statefulset/ds-plugin-bundle-poc-worker --tail=400 | egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException|StorageOperator'
+! kubectl logs -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api --tail=400 | egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException'
+! kubectl logs -n ds-plugin-bundle-poc statefulset/ds-plugin-bundle-poc-worker --tail=400 | egrep 'NoSuchBeanDefinitionException|UnsatisfiedDependencyException'
