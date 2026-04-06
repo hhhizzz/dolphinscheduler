@@ -215,7 +215,38 @@ Create a database environment variables.
   value: {{ .Values.mysql.driverClassName }}
   {{- else }}
   value: {{ .Values.externalDatabase.driverClassName | quote }}
-  {{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Return true if the db init job can safely run before regular resources.
+*/}}
+{{- define "dolphinscheduler.db_init.use_pre_install_hook" -}}
+{{- if and .Values.externalDatabase.enabled (not .Values.zookeeper.enabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create database env vars for the db init job when it must run before normal secrets/configmaps exist.
+*/}}
+{{- define "dolphinscheduler.database.db_init_env_vars" -}}
+- name: DATABASE
+  value: {{ .Values.externalDatabase.type | quote }}
+{{- if eq .Values.externalDatabase.type "mysql" }}
+- name: SPRING_PROFILES_ACTIVE
+  value: mysql
+{{- end }}
+- name: SPRING_DATASOURCE_URL
+  value: jdbc:{{ .Values.externalDatabase.type }}://{{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}/{{ .Values.externalDatabase.database }}?{{ .Values.externalDatabase.params }}
+- name: SPRING_DATASOURCE_USERNAME
+  value: {{ .Values.externalDatabase.username | quote }}
+- name: SPRING_DATASOURCE_PASSWORD
+  value: {{ .Values.externalDatabase.password | quote }}
+- name: SPRING_DATASOURCE_DRIVER-CLASS-NAME
+  value: {{ .Values.externalDatabase.driverClassName | quote }}
 {{- end -}}
 
 {{/*
@@ -336,6 +367,56 @@ Create a registry environment variables.
   {{- else }}
   value: {{ .Values.externalRegistry.registryServers }}
   {{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Create registry env vars for the db init job when it must run before normal secrets/configmaps exist.
+*/}}
+{{- define "dolphinscheduler.registry.db_init_env_vars" -}}
+- name: REGISTRY_TYPE
+  {{- if .Values.registryEtcd.enabled }}
+  value: "etcd"
+  {{- else if .Values.registryJdbc.enabled }}
+  value: "jdbc"
+  {{- else }}
+  value: {{ .Values.externalRegistry.registryPluginName }}
+  {{- end }}
+{{- if .Values.registryEtcd.enabled }}
+- name: REGISTRY_ENDPOINTS
+  value: {{ .Values.registryEtcd.endpoints }}
+- name: REGISTRY_NAMESPACE
+  value: {{ .Values.registryEtcd.namespace }}
+- name: REGISTRY_USER
+  value: {{ .Values.registryEtcd.user }}
+- name: REGISTRY_PASSWORD
+  value: {{ .Values.registryEtcd.passWord }}
+- name: REGISTRY_AUTHORITY
+  value: {{ .Values.registryEtcd.authority }}
+- name: REGISTRY_CERT_FILE
+  value: {{ .Values.registryEtcd.ssl.certFile }}
+- name: REGISTRY_KEY_CERT_CHAIN_FILE
+  value: {{ .Values.registryEtcd.ssl.keyCertChainFile }}
+- name: REGISTRY_KEY_FILE
+  value: {{ .Values.registryEtcd.ssl.keyFile }}
+{{- else if .Values.registryJdbc.enabled }}
+- name: REGISTRY_TERM_REFRESH_INTERVAL
+  value: {{ .Values.registryJdbc.termRefreshInterval }}
+- name: REGISTRY_TERM_EXPIRE_TIMES
+  value: {{ .Values.registryJdbc.termExpireTimes | quote }}
+{{- if .Values.registryJdbc.hikariConfig.enabled }}
+- name: REGISTRY_HIKARI_CONFIG_DRIVER_CLASS_NAME
+  value: {{ .Values.registryJdbc.hikariConfig.driverClassName }}
+- name: REGISTRY_HIKARI_CONFIG_JDBC_URL
+  value: {{ .Values.registryJdbc.hikariConfig.jdbcurl }}
+- name: REGISTRY_HIKARI_CONFIG_USERNAME
+  value: {{ .Values.registryJdbc.hikariConfig.username }}
+- name: REGISTRY_HIKARI_CONFIG_PASSWORD
+  value: {{ .Values.registryJdbc.hikariConfig.password | quote }}
+{{- end }}
+{{- else }}
+- name: REGISTRY_ZOOKEEPER_CONNECT_STRING
+  value: {{ .Values.externalRegistry.registryServers }}
 {{- end }}
 {{- end -}}
 

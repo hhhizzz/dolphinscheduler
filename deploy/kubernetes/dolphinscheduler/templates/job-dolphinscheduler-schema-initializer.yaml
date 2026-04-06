@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 {{- if and .Values.api.enabled }}
+{{- $usePreInstallHook := eq (include "dolphinscheduler.db_init.use_pre_install_hook" .) "true" }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -22,8 +23,9 @@ metadata:
   labels:
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook": {{ ternary "pre-install,pre-upgrade,pre-rollback" "post-install,post-upgrade,post-rollback" $usePreInstallHook }}
     "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   template:
     metadata:
@@ -48,9 +50,16 @@ spec:
               value: {{ .Values.timezone }}
             - name: SPRING_JACKSON_TIME_ZONE
               value: {{ .Values.timezone }}
+            {{- if $usePreInstallHook }}
+            {{- include "dolphinscheduler.database.db_init_env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.registry.db_init_env_vars" . | nindent 12 }}
+            {{- else }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
+            {{- end }}
+          {{- if not $usePreInstallHook }}
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
+          {{- end }}
 {{- end }}
