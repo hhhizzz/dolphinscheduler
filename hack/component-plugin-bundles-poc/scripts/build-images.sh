@@ -6,6 +6,7 @@ ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 POC_DIR="${ROOT}/hack/component-plugin-bundles-poc"
 BUILD_DIR="${POC_DIR}/build"
 DOCKER_DIR="${POC_DIR}/docker"
+TOOLS_IMAGE="apache/dolphinscheduler-tools:dev-SNAPSHOT"
 
 assert_empty_plugins_dir() {
   local image="$1"
@@ -39,12 +40,14 @@ test -f "${BUILD_DIR}/release-bin.tar.gz"
 test -f "${BUILD_DIR}/staging-bin.tar.gz"
 
 tmp_plugins_dir="$(mktemp -d)"
-trap 'rm -rf "${tmp_plugins_dir}"' EXIT
+tmp_tools_context="$(mktemp -d)"
+trap 'rm -rf "${tmp_plugins_dir}" "${tmp_tools_context}"' EXIT
 mkdir -p \
   "${tmp_plugins_dir}/datasource-plugins/alpha/beta" \
   "${tmp_plugins_dir}/storage-plugins/gamma/delta" \
   "${tmp_plugins_dir}/task-plugins/epsilon/zeta" \
   "${tmp_plugins_dir}/alert-plugins/theta/iota"
+mkdir -p "${tmp_tools_context}/target"
 touch \
   "${tmp_plugins_dir}/._alert-plugins" \
   "${tmp_plugins_dir}/._datasource-plugins" \
@@ -71,6 +74,8 @@ test -z "$(find "${tmp_plugins_dir}" -name '._*' -print -quit)"
 test -z "$(find "${tmp_plugins_dir}/datasource-plugins" -mindepth 2 -type d -print -quit)"
 test -z "$(find "${tmp_plugins_dir}/storage-plugins" -mindepth 2 -type d -print -quit)"
 test -z "$(find "${tmp_plugins_dir}/task-plugins" -mindepth 2 -type d -print -quit)"
+cp "${BUILD_DIR}/release-bin.tar.gz" \
+  "${tmp_tools_context}/target/apache-dolphinscheduler-dev-SNAPSHOT-bin.tar.gz"
 
 docker buildx build --load \
   -t apache/dolphinscheduler-api:dev-SNAPSHOT-base \
@@ -87,6 +92,11 @@ docker buildx build --load \
 docker buildx build --load \
   -t apache/dolphinscheduler-server-plugins:dev-SNAPSHOT \
   -f "${DOCKER_DIR}/server-plugins.dockerfile" "${POC_DIR}"
+
+docker buildx build --load \
+  -t "${TOOLS_IMAGE}" \
+  -f "${ROOT}/dolphinscheduler-dist/src/main/docker/tools.dockerfile" \
+  "${tmp_tools_context}"
 
 assert_empty_plugins_dir "apache/dolphinscheduler-api:dev-SNAPSHOT-base"
 assert_empty_plugins_dir "apache/dolphinscheduler-master:dev-SNAPSHOT-base"

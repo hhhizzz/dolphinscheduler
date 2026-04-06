@@ -32,6 +32,10 @@ fi
 "${POC_DIR}/scripts/render-base.sh"
 "${POC_DIR}/scripts/load-images.sh"
 
+if ! kubectl create namespace "${NAMESPACE}"; then
+  fail "failed to create namespace ${NAMESPACE}"
+fi
+
 if ! kubectl apply -k "${POC_DIR}/k8s"; then
   fail "failed to apply kustomize overlay"
 fi

@@ -7,5 +7,6 @@ for node in desktop-worker; do
     apache/dolphinscheduler-master:dev-SNAPSHOT-base \
     apache/dolphinscheduler-worker:dev-SNAPSHOT-base \
     apache/dolphinscheduler-server-plugins:dev-SNAPSHOT \
+    apache/dolphinscheduler-tools:dev-SNAPSHOT \
   | docker exec -i "${node}" ctr -n k8s.io images import -
 done
