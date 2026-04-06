@@ -18,6 +18,9 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=api -n ds-
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=master -n ds-plugin-bundle-poc --timeout=300s
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=worker -n ds-plugin-bundle-poc --timeout=300s
 
+kubectl exec -n ds-plugin-bundle-poc statefulset/ds-plugin-bundle-poc-master -- find /opt/dolphinscheduler/plugins/datasource-plugins -maxdepth 1 -name "*.jar" -print -quit | tee "${TMP_DIR}/master_plugins"
+test -s "${TMP_DIR}/master_plugins"
+
 kubectl exec -n ds-plugin-bundle-poc deploy/ds-plugin-bundle-poc-api -- find /opt/dolphinscheduler/plugins/storage-plugins -maxdepth 1 -name "*.jar" | tee "${API_STORAGE_PLUGINS}"
 test -s "${API_STORAGE_PLUGINS}"
 

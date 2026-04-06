@@ -26,7 +26,7 @@ kubectl uncordon desktop-worker2 desktop-worker3 desktop-worker4 desktop-worker5
 
 ## Local Verification Notes
 
-- Built `release` and `staging` dist tarballs from `origin/dev`
+- Built `release` and `staging` dist tarballs from the current checked-out worktree
 - Built local images:
   - `apache/dolphinscheduler-api:dev-SNAPSHOT-base`
   - `apache/dolphinscheduler-master:dev-SNAPSHOT-base`
