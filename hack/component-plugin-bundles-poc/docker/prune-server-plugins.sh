@@ -9,4 +9,5 @@ for plugin_dir in datasource-plugins storage-plugins task-plugins; do
   find "${PLUGINS_DIR}/${plugin_dir}" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
 done
 
+find "${PLUGINS_DIR}" -type f -name '._*' -delete
 rm -rf "${PLUGINS_DIR}/alert-plugins"
