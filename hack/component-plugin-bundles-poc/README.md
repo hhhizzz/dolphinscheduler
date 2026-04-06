@@ -6,6 +6,8 @@ This PoC validates a `dev`-branch Kubernetes deployment model where:
 - `server-plugins` is a separate image carrying `datasource`, `storage`, and `task` plugins
 - init containers copy plugin files into `/opt/dolphinscheduler/plugins` before startup
 
+Prerequisites: Docker Desktop Kubernetes is running locally, `kubectl` targets that cluster, and the `desktop-worker` runtime can import both the PoC images and the rendered chart's dependency images.
+
 ## Commands
 
 ```bash
