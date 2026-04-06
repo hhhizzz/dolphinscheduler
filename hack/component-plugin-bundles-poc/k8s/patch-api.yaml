@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ds-plugin-bundle-poc-api
+  namespace: ds-plugin-bundle-poc
+spec:
+  template:
+    spec:
+      volumes:
+        - name: plugins-volume
+          emptyDir: {}
+      initContainers:
+        - name: server-plugins-init
+          image: apache/dolphinscheduler-server-plugins:dev-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-lc", "cp -a /opt/dolphinscheduler/plugins/. /plugin-volume/"]
+          volumeMounts:
+            - name: plugins-volume
+              mountPath: /plugin-volume
+      containers:
+        - name: ds-plugin-bundle-poc-api
+          image: apache/dolphinscheduler-api:dev-SNAPSHOT-base
+          volumeMounts:
+            - name: plugins-volume
+              mountPath: /opt/dolphinscheduler/plugins

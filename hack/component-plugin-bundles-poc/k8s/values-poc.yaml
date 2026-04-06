@@ -1,0 +1,17 @@
+image:
+  registry: apache
+  tag: dev-SNAPSHOT
+  pullPolicy: IfNotPresent
+  api: dolphinscheduler-api
+  master: dolphinscheduler-master
+  worker: dolphinscheduler-worker
+  tools: dolphinscheduler-tools
+
+alert:
+  enabled: false
+
+master:
+  replicas: 1
+
+worker:
+  replicas: 1
