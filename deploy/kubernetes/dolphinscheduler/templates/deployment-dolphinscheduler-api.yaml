@@ -62,6 +62,16 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
+      {{- if .Values.serverPlugins.enabled }}
+      initContainers:
+        - name: server-plugins-init
+          image: {{ include "dolphinscheduler.image.fullname.serverPlugins" . }}
+          imagePullPolicy: {{ include "dolphinscheduler.image.pullPolicy.serverPlugins" . }}
+          command: ["/bin/bash", "-lc", "cp -a /opt/dolphinscheduler/plugins/. /plugin-volume/"]
+          volumeMounts:
+            - name: plugins-volume
+              mountPath: /plugin-volume
+      {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-api
           image: {{ include "dolphinscheduler.image.fullname.api" . }}
@@ -161,6 +171,10 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-api
+            {{- if .Values.serverPlugins.enabled }}
+            - name: plugins-volume
+              mountPath: /opt/dolphinscheduler/plugins
+            {{- end }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/api-server/conf/common.properties
               subPath: common.properties
@@ -186,6 +200,10 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if .Values.serverPlugins.enabled }}
+        - name: plugins-volume
+          emptyDir: {}
+        {{- end }}
         - name: config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs

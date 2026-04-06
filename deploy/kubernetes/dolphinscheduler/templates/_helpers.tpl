@@ -29,20 +29,50 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create default docker images' fullname.
 */}}
+{{- define "dolphinscheduler.image.tag.default" -}}
+{{- .Values.image.tag | default .Chart.AppVersion -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.tag.master" -}}
+{{- default (include "dolphinscheduler.image.tag.default" .) .Values.image.masterTag -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.tag.worker" -}}
+{{- default (include "dolphinscheduler.image.tag.default" .) .Values.image.workerTag -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.tag.api" -}}
+{{- default (include "dolphinscheduler.image.tag.default" .) .Values.image.apiTag -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.tag.alert" -}}
+{{- default (include "dolphinscheduler.image.tag.default" .) .Values.image.alertTag -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.tag.tools" -}}
+{{- default (include "dolphinscheduler.image.tag.default" .) .Values.image.toolsTag -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.registry.serverPlugins" -}}
+{{- default .Values.image.registry .Values.serverPlugins.image.registry -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.tag.serverPlugins" -}}
+{{- default (include "dolphinscheduler.image.tag.default" .) .Values.serverPlugins.image.tag -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.pullPolicy.serverPlugins" -}}
+{{- default .Values.image.pullPolicy .Values.serverPlugins.image.pullPolicy -}}
+{{- end -}}
 {{- define "dolphinscheduler.image.fullname.master" -}}
-{{- .Values.image.registry }}/{{ .Values.image.master }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.master }}:{{ include "dolphinscheduler.image.tag.master" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.worker" -}}
-{{- .Values.image.registry }}/{{ .Values.image.worker }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.worker }}:{{ include "dolphinscheduler.image.tag.worker" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.api" -}}
-{{- .Values.image.registry }}/{{ .Values.image.api }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.api }}:{{ include "dolphinscheduler.image.tag.api" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.alert" -}}
-{{- .Values.image.registry }}/{{ .Values.image.alert }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.alert }}:{{ include "dolphinscheduler.image.tag.alert" . -}}
 {{- end -}}
 {{- define "dolphinscheduler.image.fullname.tools" -}}
-{{- .Values.image.registry }}/{{ .Values.image.tools }}:{{ .Values.image.tag | default .Chart.AppVersion -}}
+{{- .Values.image.registry }}/{{ .Values.image.tools }}:{{ include "dolphinscheduler.image.tag.tools" . -}}
+{{- end -}}
+{{- define "dolphinscheduler.image.fullname.serverPlugins" -}}
+{{- include "dolphinscheduler.image.registry.serverPlugins" . }}/{{ .Values.serverPlugins.image.repository }}:{{ include "dolphinscheduler.image.tag.serverPlugins" . -}}
 {{- end -}}
 
 {{/*

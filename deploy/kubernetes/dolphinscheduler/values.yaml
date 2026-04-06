@@ -40,6 +40,16 @@ image:
   registry: apache
   # -- Docker image version for the DolphinScheduler
   tag: latest
+  # -- Override tag for the master image. Falls back to `image.tag` when empty.
+  masterTag: ""
+  # -- Override tag for the worker image. Falls back to `image.tag` when empty.
+  workerTag: ""
+  # -- Override tag for the api image. Falls back to `image.tag` when empty.
+  apiTag: ""
+  # -- Override tag for the alert image. Falls back to `image.tag` when empty.
+  alertTag: ""
+  # -- Override tag for the tools image. Falls back to `image.tag` when empty.
+  toolsTag: ""
   # -- Image pull policy. Options: Always, Never, IfNotPresent
   pullPolicy: "IfNotPresent"
   # -- Specify a imagePullSecrets
@@ -54,6 +64,19 @@ image:
   alert: dolphinscheduler-alert-server
   # -- tools image
   tools: dolphinscheduler-tools
+
+serverPlugins:
+  # -- Enable initContainer-based injection of datasource/storage/task plugins into api, master, and worker pods.
+  enabled: false
+  image:
+    # -- Override registry for the server-plugins image. Falls back to `image.registry` when empty.
+    registry: ""
+    # -- Repository name for the server-plugins image.
+    repository: dolphinscheduler-server-plugins
+    # -- Override tag for the server-plugins image. Falls back to `image.tag` when empty.
+    tag: ""
+    # -- Override pull policy for the server-plugins image. Falls back to `image.pullPolicy` when empty.
+    pullPolicy: ""
 
 datasource:
   # -- The profile of datasource

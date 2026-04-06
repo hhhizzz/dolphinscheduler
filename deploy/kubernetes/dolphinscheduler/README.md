@@ -181,14 +181,19 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | global | object | `{"security":{"allowInsecureImages":true}}` | Global settings for Bitnami subcharts |
 | global.security.allowInsecureImages | bool | `true` | Allow using non-standard container images (required for bitnamilegacy images) |
 | image.alert | string | `"dolphinscheduler-alert-server"` | alert-server image |
+| image.alertTag | string | `""` | Override tag for the alert image. Falls back to `image.tag` when empty. |
 | image.api | string | `"dolphinscheduler-api"` | api-server image |
+| image.apiTag | string | `""` | Override tag for the api image. Falls back to `image.tag` when empty. |
 | image.master | string | `"dolphinscheduler-master"` | master image |
+| image.masterTag | string | `""` | Override tag for the master image. Falls back to `image.tag` when empty. |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy. Options: Always, Never, IfNotPresent |
 | image.pullSecret | string | `""` | Specify a imagePullSecrets |
 | image.registry | string | `"apache"` | Docker image repository for the DolphinScheduler |
 | image.tag | string | `"latest"` | Docker image version for the DolphinScheduler |
 | image.tools | string | `"dolphinscheduler-tools"` | tools image |
+| image.toolsTag | string | `""` | Override tag for the tools image. Falls back to `image.tag` when empty. |
 | image.worker | string | `"dolphinscheduler-worker"` | worker image |
+| image.workerTag | string | `""` | Override tag for the worker image. Falls back to `image.tag` when empty. |
 | ingress.annotations | object | `{}` | Ingress annotations |
 | ingress.enabled | bool | `false` | Enable ingress |
 | ingress.host | string | `"dolphinscheduler.org"` | Ingress host |
@@ -318,6 +323,11 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | security.authentication.ldap.user.notexistaction | string | `"CREATE"` | action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY) |
 | security.authentication.ldap.username | string | `"cn=read-only-admin,dc=example,dc=com"` | LDAP username |
 | security.authentication.type | string | `"PASSWORD"` | Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO) |
+| serverPlugins.enabled | bool | `false` | Enable initContainer-based injection of datasource/storage/task plugins into api, master, and worker pods. |
+| serverPlugins.image.pullPolicy | string | `""` | Override pull policy for the server-plugins image. Falls back to `image.pullPolicy` when empty. |
+| serverPlugins.image.registry | string | `""` | Override registry for the server-plugins image. Falls back to `image.registry` when empty. |
+| serverPlugins.image.repository | string | `"dolphinscheduler-server-plugins"` | Repository name for the server-plugins image. |
+| serverPlugins.image.tag | string | `""` | Override tag for the server-plugins image. Falls back to `image.tag` when empty. |
 | timezone | string | `"Asia/Shanghai"` | World time and date for cities in all time zones |
 | worker.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | worker.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
