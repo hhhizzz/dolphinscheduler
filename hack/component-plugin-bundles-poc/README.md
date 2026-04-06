@@ -23,3 +23,14 @@ hack/component-plugin-bundles-poc/scripts/verify.sh
 kubectl delete namespace ds-plugin-bundle-poc --ignore-not-found
 kubectl uncordon desktop-worker2 desktop-worker3 desktop-worker4 desktop-worker5 || true
 ```
+
+## Local Verification Notes
+
+- Built `release` and `staging` dist tarballs from `origin/dev`
+- Built local images:
+  - `apache/dolphinscheduler-api:dev-SNAPSHOT-base`
+  - `apache/dolphinscheduler-master:dev-SNAPSHOT-base`
+  - `apache/dolphinscheduler-worker:dev-SNAPSHOT-base`
+  - `apache/dolphinscheduler-server-plugins:dev-SNAPSHOT`
+- Loaded the images into the local Docker Desktop Kubernetes worker runtime
+- Verified API and Worker startup with S3 plugin injection and no missing `StorageOperator` bean
