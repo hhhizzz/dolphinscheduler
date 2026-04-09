@@ -8,9 +8,11 @@ tmp_values_external="$(mktemp)"
 tmp_values_default="$(mktemp)"
 tmp_output_external="$(mktemp)"
 tmp_output_default="$(mktemp)"
+tmp_output_default_upgrade="$(mktemp)"
 tmp_job_external="$(mktemp)"
 tmp_job_default="$(mktemp)"
-trap 'rm -f "${tmp_values_external}" "${tmp_values_default}" "${tmp_output_external}" "${tmp_output_default}" "${tmp_job_external}" "${tmp_job_default}"' EXIT
+tmp_job_default_upgrade="$(mktemp)"
+trap 'rm -f "${tmp_values_external}" "${tmp_values_default}" "${tmp_output_external}" "${tmp_output_default}" "${tmp_output_default_upgrade}" "${tmp_job_external}" "${tmp_job_default}" "${tmp_job_default_upgrade}"' EXIT
 
 cat <<'EOF' > "${tmp_values_external}"
 image:
@@ -58,8 +60,10 @@ touch "${tmp_values_default}"
 
 helm template ds-plugin-bundle "${CHART_DIR}" -f "${tmp_values_external}" > "${tmp_output_external}"
 helm template ds-plugin-bundle "${CHART_DIR}" -f "${tmp_values_default}" > "${tmp_output_default}"
+helm template ds-plugin-bundle "${CHART_DIR}" --is-upgrade -f "${tmp_values_default}" > "${tmp_output_default_upgrade}"
 awk '/^  name: ds-plugin-bundle-db-init-job$/{flag=1} flag{print} /^---$/{if(flag){exit}}' "${tmp_output_external}" > "${tmp_job_external}"
-awk '/^  name: ds-plugin-bundle-db-init-job$/{flag=1} flag{print} /^---$/{if(flag){exit}}' "${tmp_output_default}" > "${tmp_job_default}"
+awk '/^  name: ds-plugin-bundle-db-init-install-job$/{flag=1} flag{print} /^---$/{if(flag){exit}}' "${tmp_output_default}" > "${tmp_job_default}"
+awk '/^  name: ds-plugin-bundle-db-init-job$/{flag=1} flag{print} /^---$/{if(flag){exit}}' "${tmp_output_default_upgrade}" > "${tmp_job_default_upgrade}"
 
 assert_contains() {
   local file="$1"
@@ -90,6 +94,10 @@ assert_not_contains "${tmp_job_external}" 'name: ds-plugin-bundle-externaldb'
 assert_not_contains "${tmp_job_external}" 'name: ds-plugin-bundle-registry-db'
 assert_not_contains "${tmp_job_external}" 'configMapRef:'
 
-assert_contains "${tmp_job_default}" '"helm.sh/hook": post-install,post-upgrade,post-rollback'
+assert_not_contains "${tmp_job_default}" '"helm.sh/hook":'
+assert_not_contains "${tmp_job_default}" '"helm.sh/hook-delete-policy":'
+assert_not_contains "${tmp_job_default}" '"helm.sh/hook-weight":'
 assert_contains "${tmp_job_default}" 'name: ds-plugin-bundle-postgresql'
 assert_contains "${tmp_job_default}" 'name: ds-plugin-bundle-common'
+assert_contains "${tmp_job_default_upgrade}" '"helm.sh/hook": pre-upgrade,pre-rollback'
+assert_contains "${tmp_job_default_upgrade}" '"helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded'

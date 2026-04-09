@@ -89,6 +89,10 @@ postgresql:
   driverClassName: "org.postgresql.Driver"
   # -- The params for internal PostgreSQL
   params: "characterEncoding=utf8"
+  # Compatibility keys for the vendored Bitnami PostgreSQL subchart.
+  postgresqlUsername: "root"
+  postgresqlPassword: "root"
+  postgresqlDatabase: "dolphinscheduler"
   auth:
     # -- The username for internal PostgreSQL
     username: "root"

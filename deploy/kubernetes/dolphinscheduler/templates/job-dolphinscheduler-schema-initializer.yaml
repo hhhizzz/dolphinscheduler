@@ -15,18 +15,25 @@
 # limitations under the License.
 #
 {{- if and .Values.api.enabled }}
+{{- $isInstall := .Release.IsInstall }}
 {{- $usePreInstallHook := eq (include "dolphinscheduler.db_init.use_pre_install_hook" .) "true" }}
+{{- $installAsRegularJob := and $isInstall (not $usePreInstallHook) }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-db-init-job
+  name: {{ include "dolphinscheduler.fullname" . }}-db-init{{ ternary "-install" "" $installAsRegularJob }}-job
   labels:
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  {{- if not $installAsRegularJob }}
   annotations:
-    "helm.sh/hook": {{ ternary "pre-install,pre-upgrade,pre-rollback" "post-install,post-upgrade,post-rollback" $usePreInstallHook }}
+    "helm.sh/hook": {{ ternary "pre-install,pre-upgrade,pre-rollback" "pre-upgrade,pre-rollback" $usePreInstallHook }}
     "helm.sh/hook-weight": "1"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  {{- end }}
 spec:
+  {{- if $installAsRegularJob }}
+  ttlSecondsAfterFinished: 300
+  {{- end }}
   template:
     metadata:
       labels:
