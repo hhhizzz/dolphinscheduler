@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.tools.datasource.utils;
 
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
 
 class SchemaUtilsTest {
 
@@ -72,6 +76,37 @@ class SchemaUtilsTest {
             Assertions.fail(ex.getMessage());
         }
         Assertions.assertFalse(CollectionUtils.isEmpty(list), "Can not find any schema files");
+    }
+
+    @Test
+    void testPostgresql331UpgradeScriptDropsExistingUniqueWorkflowIndexBeforeRecreatingIt() throws IOException {
+        final ClassPathResource sqlResource =
+                new ClassPathResource("sql/upgrade/3.3.1_schema/postgresql/dolphinscheduler_ddl.sql");
+        final String ddl;
+        try (InputStream inputStream = sqlResource.getInputStream()) {
+            ddl = FileUtils.readFile2Str(inputStream);
+        }
+
+        final String dropUniqueIndex = "drop index if exists uniq_workflow_definition_code;";
+        final String createUniqueIndex =
+                "create unique index uniq_workflow_definition_code on t_ds_workflow_definition (code);";
+        final String dropCommandTestFlag = "ALTER TABLE t_ds_command DROP COLUMN IF EXISTS test_flag;";
+        final String dropErrorCommandTestFlag = "ALTER TABLE t_ds_error_command DROP COLUMN IF EXISTS test_flag;";
+        final String dropWorkflowInstanceTestFlag = "ALTER TABLE t_ds_workflow_instance DROP COLUMN IF EXISTS test_flag;";
+        final String dropTaskInstanceTestFlag = "ALTER TABLE t_ds_task_instance DROP COLUMN IF EXISTS test_flag;";
+
+        Assertions.assertTrue(ddl.contains(dropUniqueIndex),
+                "3.3.1 PostgreSQL upgrade must drop the existing unique workflow index before recreating it");
+        Assertions.assertTrue(ddl.indexOf(dropUniqueIndex) < ddl.indexOf(createUniqueIndex),
+                "3.3.1 PostgreSQL upgrade must drop the old unique workflow index before recreating it");
+        Assertions.assertTrue(ddl.contains(dropCommandTestFlag),
+                "3.3.1 PostgreSQL upgrade must drop t_ds_command.test_flag idempotently");
+        Assertions.assertTrue(ddl.contains(dropErrorCommandTestFlag),
+                "3.3.1 PostgreSQL upgrade must drop t_ds_error_command.test_flag idempotently");
+        Assertions.assertTrue(ddl.contains(dropWorkflowInstanceTestFlag),
+                "3.3.1 PostgreSQL upgrade must drop t_ds_workflow_instance.test_flag idempotently");
+        Assertions.assertTrue(ddl.contains(dropTaskInstanceTestFlag),
+                "3.3.1 PostgreSQL upgrade must drop t_ds_task_instance.test_flag idempotently");
     }
 
 }

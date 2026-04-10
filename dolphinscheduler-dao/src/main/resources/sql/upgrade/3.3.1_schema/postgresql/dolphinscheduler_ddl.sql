@@ -16,11 +16,12 @@
 */
 
 drop index if exists workflow_definition_index;
+drop index if exists uniq_workflow_definition_code;
 create unique index uniq_workflow_definition_code on t_ds_workflow_definition (code);
-ALTER TABLE t_ds_command DROP COLUMN test_flag;
-ALTER TABLE t_ds_error_command DROP COLUMN test_flag;
-ALTER TABLE t_ds_workflow_instance DROP COLUMN test_flag;
-ALTER TABLE t_ds_task_instance DROP COLUMN test_flag;
+ALTER TABLE t_ds_command DROP COLUMN IF EXISTS test_flag;
+ALTER TABLE t_ds_error_command DROP COLUMN IF EXISTS test_flag;
+ALTER TABLE t_ds_workflow_instance DROP COLUMN IF EXISTS test_flag;
+ALTER TABLE t_ds_task_instance DROP COLUMN IF EXISTS test_flag;
 
 ALTER TABLE t_ds_workflow_task_lineage
 DROP CONSTRAINT t_ds_workflow_task_lineage_pkey;

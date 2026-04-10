@@ -19,13 +19,38 @@ set -xeo pipefail
 
 DOCKER_HUB=$1
 DOCKER_TAG=$2
+DOCKER_PLATFORM=${3:-${DOCKER_PLATFORM:-}}
 DOCKER_REPO_BASE=dolphinscheduler
 
-CURRENT_HOME=$(dirname $(readlink -f "$0"))
+CURRENT_HOME=$(dirname "$(readlink -f "$0")")
 
-docker buildx build --load --no-cache -t $DOCKER_HUB/$DOCKER_REPO_BASE-api:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-api:latest -f ${CURRENT_HOME}/api-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-master:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-master:latest -f ${CURRENT_HOME}/master-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-worker:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-worker:latest -f ${CURRENT_HOME}/worker-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-alert-server:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-alert-server:latest -f ${CURRENT_HOME}/alert-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-standalone-server:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-standalone-server:latest -f ${CURRENT_HOME}/standalone-server.dockerfile .
-docker buildx build --load -t $DOCKER_HUB/$DOCKER_REPO_BASE-tools:$DOCKER_TAG -t $DOCKER_HUB/$DOCKER_REPO_BASE-tools:latest -f ${CURRENT_HOME}/tools.dockerfile .
+build_image() {
+    local dockerfile=$1
+    local image_name=$2
+    local use_no_cache=${3:-false}
+    local cmd=(docker buildx build --load)
+
+    if [[ "${use_no_cache}" == "true" ]]; then
+        cmd+=(--no-cache)
+    fi
+    if [[ -n "${DOCKER_PLATFORM}" ]]; then
+        cmd+=(--platform "${DOCKER_PLATFORM}")
+    fi
+
+    cmd+=(
+        -t "${DOCKER_HUB}/${DOCKER_REPO_BASE}-${image_name}:${DOCKER_TAG}"
+        -t "${DOCKER_HUB}/${DOCKER_REPO_BASE}-${image_name}:latest"
+        -f "${CURRENT_HOME}/${dockerfile}"
+        .
+    )
+
+    "${cmd[@]}"
+}
+
+build_image api-server.dockerfile api true
+build_image server-plugins.dockerfile server-plugins
+build_image master-server.dockerfile master
+build_image worker-server.dockerfile worker
+build_image alert-server.dockerfile alert-server
+build_image standalone-server.dockerfile standalone-server
+build_image tools.dockerfile tools

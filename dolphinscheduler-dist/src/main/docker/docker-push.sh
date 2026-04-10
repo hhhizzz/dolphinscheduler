@@ -19,13 +19,37 @@ set -xeo pipefail
 
 DOCKER_HUB=$1
 DOCKER_TAG=$2
+DOCKER_PLATFORM=${3:-${DOCKER_PLATFORM:-linux/amd64,linux/arm64}}
 DOCKER_REPO_BASE=dolphinscheduler
 
-CURRENT_HOME=$(dirname $(readlink -f "$0"))
+CURRENT_HOME=$(dirname "$(readlink -f "$0")")
 
-docker buildx build --push --no-cache --platform linux/amd64,linux/arm64 -t $DOCKER_HUB/$DOCKER_REPO_BASE-api:$DOCKER_TAG -f ${CURRENT_HOME}/api-server.dockerfile .
-docker buildx build --push --platform linux/amd64,linux/arm64 -t $DOCKER_HUB/$DOCKER_REPO_BASE-master:$DOCKER_TAG -f ${CURRENT_HOME}/master-server.dockerfile .
-docker buildx build --push --platform linux/amd64,linux/arm64 -t $DOCKER_HUB/$DOCKER_REPO_BASE-worker:$DOCKER_TAG -f ${CURRENT_HOME}/worker-server.dockerfile .
-docker buildx build --push --platform linux/amd64,linux/arm64 -t $DOCKER_HUB/$DOCKER_REPO_BASE-alert-server:$DOCKER_TAG -f ${CURRENT_HOME}/alert-server.dockerfile .
-docker buildx build --push --platform linux/amd64,linux/arm64 -t $DOCKER_HUB/$DOCKER_REPO_BASE-standalone-server:$DOCKER_TAG -f ${CURRENT_HOME}/standalone-server.dockerfile .
-docker buildx build --push --platform linux/amd64,linux/arm64 -t $DOCKER_HUB/$DOCKER_REPO_BASE-tools:$DOCKER_TAG -f ${CURRENT_HOME}/tools.dockerfile .
+build_image() {
+    local dockerfile=$1
+    local image_name=$2
+    local use_no_cache=${3:-false}
+    local cmd=(docker buildx build --push)
+
+    if [[ "${use_no_cache}" == "true" ]]; then
+        cmd+=(--no-cache)
+    fi
+    if [[ -n "${DOCKER_PLATFORM}" ]]; then
+        cmd+=(--platform "${DOCKER_PLATFORM}")
+    fi
+
+    cmd+=(
+        -t "${DOCKER_HUB}/${DOCKER_REPO_BASE}-${image_name}:${DOCKER_TAG}"
+        -f "${CURRENT_HOME}/${dockerfile}"
+        .
+    )
+
+    "${cmd[@]}"
+}
+
+build_image api-server.dockerfile api true
+build_image server-plugins.dockerfile server-plugins
+build_image master-server.dockerfile master
+build_image worker-server.dockerfile worker
+build_image alert-server.dockerfile alert-server
+build_image standalone-server.dockerfile standalone-server
+build_image tools.dockerfile tools
